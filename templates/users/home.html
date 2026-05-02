@@ -1,0 +1,678 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artify | Premium Art Gallery</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #d4af37; /* Gold */
+            --bg-dark: #070707;
+            --bg-card: rgba(255, 255, 255, 0.03);
+            --glass-bg: rgba(10, 10, 10, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f4f4f4;
+            --text-muted: #a0a0a0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-main);
+            scroll-behavior: smooth;
+        }
+
+        /* NAVBAR (Glassmorphism) */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 60px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--glass-border);
+            z-index: 1000;
+            transition: 0.3s ease;
+        }
+
+        .navbar .logo {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: #fff;
+            text-transform: uppercase;
+        }
+
+        .navbar .logo span {
+            color: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            flex-wrap: nowrap;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 14px;
+            white-space: nowrap;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            display: block;
+            margin-top: 5px;
+            right: 0;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+            left: 0;
+            background: var(--primary);
+        }
+
+        /* HERO SECTION */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            /* Using the generated image as background */
+            background: url('{% static "images/hero_bg.png" %}') no-repeat center center;
+            background-size: cover;
+            background-attachment: fixed;
+            filter: brightness(0.4) saturate(1.2);
+            z-index: -1;
+            animation: zoomIn 20s infinite alternate linear;
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
+        }
+
+        .hero-content {
+            z-index: 1;
+            padding: 0 20px;
+            animation: fadeUp 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .hero-content h1 {
+            font-size: 64px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+
+        .hero-content h1 span {
+            color: var(--primary);
+        }
+
+        .hero-content p {
+            font-size: 20px;
+            font-weight: 300;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 40px auto;
+            line-height: 1.6;
+        }
+
+        .btn-primary {
+            display: inline-block;
+            padding: 16px 45px;
+            background: var(--primary);
+            color: #000;
+            font-weight: 600;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: 0.4s;
+            border: 1px solid var(--primary);
+            box-shadow: 0 10px 20px rgba(212, 175, 55, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: transparent;
+            color: var(--primary);
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+            transform: translateY(-3px);
+        }
+
+        /* SECTION UTILS */
+        .section {
+            padding: 100px 10%;
+        }
+
+        .section-title {
+            font-size: 40px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 60px;
+            letter-spacing: 1px;
+        }
+
+        .section-title span {
+            color: var(--primary);
+            font-style: italic;
+        }
+
+        /* ARTWORKS GRID */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 40px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-15px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-img-wrapper {
+            width: 100%;
+            height: 380px;
+            overflow: hidden;
+        }
+
+        .card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: 0.5s ease;
+        }
+
+        .card:hover img {
+            transform: scale(1.08); /* slight zoom on hover */
+        }
+
+        .card-body {
+            padding: 25px;
+        }
+
+        .card-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .card-artist {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 15px;
+        }
+
+        .price {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status.available {
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .status.sold {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        /* PROCESS / VIDEO SECTION */
+        .video-section {
+            background: linear-gradient(to bottom, #000, #0a0a0a);
+            text-align: center;
+        }
+
+        .video-wrapper {
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            border: 1px solid var(--glass-border);
+            aspect-ratio: 16/9;
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* CTA SECTION */
+        .cta-section {
+            text-align: center;
+            padding: 120px 20px;
+            background: url('{% static "images/art1.png" %}') no-repeat center center;
+            background-size: cover;
+            background-attachment: fixed;
+            position: relative;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8);
+        }
+
+        .cta-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-content h2 {
+            font-size: 48px;
+            margin-bottom: 30px;
+        }
+
+        /* ANIMATIONS */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsiveness */
+        @media (max-width: 768px) {
+            .hero-content h1 { font-size: 40px; }
+            .nav-links { display: none; }
+            .navbar { padding: 20px; }
+            .section { padding: 60px 5%; }
+        }
+    
+        /* ARTWORK MODAL STYLES */
+        .artwork-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.85);
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .artwork-modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+        }
+
+        /* WALLPAPER BACKGROUND */
+        .artwork-modal {
+            background: radial-gradient(circle at center, #2a2a2a, #000);
+        }
+
+        .modal-content {
+            /* PLAIN WALL TEXTURE */
+            background: #e8e6e1 url('https://www.transparenttextures.com/patterns/cream-paper.png');
+            margin: auto;
+            padding: 40px;
+            border: 1px solid var(--glass-border);
+            width: 80%;
+            max-width: 1000px;
+            border-radius: 20px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+            display: flex;
+            gap: 40px;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .artwork-modal.show .modal-content {
+            transform: scale(1);
+        }
+
+        .close-modal {
+            color: #aaa;
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 38px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .close-modal:hover {
+            color: #fff;
+        }
+
+        /* HANGING STRING EFFECT */
+        .hanging-string {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            width: 100px;
+            height: 40px;
+            border-left: 2px solid #555;
+            border-right: 2px solid #555;
+            transform: translateX(-50%);
+            clip-path: polygon(50% 0, 100% 100%, 0 100%);
+        }
+        .hanging-nail {
+            position: absolute;
+            top: -45px;
+            left: 50%;
+            width: 10px;
+            height: 10px;
+            background: radial-gradient(circle, #333, #000);
+            border-radius: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+
+        .modal-frame {
+            flex: 1;
+            padding: 30px;
+            background: #fff; /* White matting */
+            /* WOODEN/GOLDEN FRAME EFFECT */
+            border: 30px solid #4a2e15;
+            border-image: linear-gradient(to bottom right, #5c3a21, #2b180d, #5c3a21) 1;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.5), 0 30px 50px rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .modal-frame img {
+            max-width: 100%;
+            max-height: 60vh;
+            object-fit: contain;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+
+        .modal-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: rgba(0,0,0,0.8); /* Card on the wall */
+            padding: 30px;
+            border-radius: 10px;
+            color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                flex-direction: column;
+                padding: 20px;
+                gap: 20px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">Arti<span>fy</span></div>
+        <div class="nav-links">
+            <a href="#">Home</a>
+            <a href="#artworks">Collections</a>
+            <a href="#process">The Process</a>
+            <a href="#testimonials">Testimonials</a>
+            <a href="/login/">Login</a>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <header class="hero">
+        <div class="hero-content">
+            <h1>Discover the <span>Masterpieces</span></h1>
+            <p>Immerse yourself in a curated world of premium art, aesthetic pottery, and visionary creations from independent artists worldwide.</p>
+            <a href="#artworks" class="btn-primary">Explore Gallery</a>
+        </div>
+    </header>
+
+    <!-- ARTWORKS COLLECTION -->
+    <section class="section" id="artworks">
+        <h2 class="section-title">Exclusive <span>Collections</span></h2>
+        
+        <div class="grid">
+            {% for artwork in featured_artworks %}
+            <div class="card">
+                <div class="card-img-wrapper" onclick="openModal('{{ artwork.title|escapejs }}', '{{ artwork.seller.username|escapejs }}', '{{ artwork.description|escapejs }}', '{{ artwork.price }}', '{% if artwork.image %}{{ artwork.image.url }}{% else %}{% static "images/art1.png" %}{% endif %}', '{{ artwork.id }}', '{{ artwork.status }}', false)" style="cursor:pointer;">
+                    {% if artwork.image %}
+                    <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}">
+                    {% else %}
+                    <img src="{% static 'images/art1.png' %}" alt="{{ artwork.title }}">
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <div class="card-title">{{ artwork.title }}</div>
+                    <span class="card-artist">by {{ artwork.seller.username }}</span>
+                    <div class="card-footer">
+                        <div class="price">₹{{ artwork.price }}</div>
+                        {% if artwork.status == 'available' %}
+                        <div class="status available">Available</div>
+                        {% else %}
+                        <div class="status sold">Sold Out</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p style="color: var(--text-muted); text-align: center; width: 100%;">No artworks have been published yet.</p>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- PROCESS / VIDEO SECTION -->
+    <section class="section video-section" id="process">
+        <h2 class="section-title">The Art of <span>Creation</span></h2>
+        <p style="color: var(--text-muted); max-width: 600px; margin: 0 auto 50px auto; line-height: 1.6; text-align: center;">
+            Witness the intricate details, passion, and technique behind some of the world's most beautiful handcrafted abstract creations.
+        </p>
+        
+        <div class="video-wrapper">
+            <video controls autoplay muted loop style="width: 100%; max-width: 800px; border-radius: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+                <source src="{% static "media/Realistic Tiger Charcoal Drawing-Hunter's gaze.mp4" %}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+    </section>
+
+    <!-- TESTIMONIALS SECTION -->
+    <section class="section" id="testimonials" style="background: #0a0a0a;">
+        <h2 class="section-title">What They <span>Say</span></h2>
+        <div style="display: flex; gap: 20px; overflow-x: auto; padding-bottom: 20px; max-width: 1200px; margin: 0 auto;">
+            {% for review in testimonials %}
+            <div style="min-width: 350px; max-width: 400px; background: rgba(255,255,255,0.05); padding: 25px; border-radius: 15px; border: 1px solid var(--glass-border); display: flex; flex-direction: column;">
+                <!-- Top row: Name & Reviews -->
+                <div style="margin-bottom: 12px;">
+                    <div style="font-size: 22px; font-weight: 700; color: #fff; line-height: 1.1; text-transform: capitalize;">{{ review.user.username }}</div>
+                    <div style="font-size: 14px; color: var(--text-muted); margin-top: 4px;">{{ review.user.testimonials.count }} reviews</div>
+                </div>
+                
+                <!-- Stars & Time -->
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                    <div style="color: var(--primary); font-size: 16px;">
+                        {% if review.rating == 5 %}⭐⭐⭐⭐⭐{% elif review.rating == 4 %}⭐⭐⭐⭐<span style="opacity: 0.3;">⭐</span>{% elif review.rating == 3 %}⭐⭐⭐<span style="opacity: 0.3;">⭐⭐</span>{% elif review.rating == 2 %}⭐⭐<span style="opacity: 0.3;">⭐⭐⭐</span>{% else %}⭐<span style="opacity: 0.3;">⭐⭐⭐⭐</span>{% endif %}
+                    </div>
+                    <div style="font-size: 14px; color: var(--text-muted);">{{ review.created_at|timesince }} ago</div>
+                </div>
+                
+                <!-- Verified role -->
+                <div style="font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 15px;">
+                    Verified {{ review.role_at_time|default:"Buyer"|title }}
+                </div>
+                
+                <!-- Review text -->
+                <div style="font-size: 15px; color: var(--text-main); line-height: 1.6;">
+                    "{{ review.comment }}"
+                </div>
+
+                {% if review.admin_reply %}
+                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); font-size: 13px; color: var(--primary);">
+                    <strong>Artify Response:</strong><br>
+                    {{ review.admin_reply }}
+                </div>
+                {% endif %}
+            </div>
+            {% empty %}
+            <p style="color: var(--text-muted); text-align: center; width: 100%;">No testimonials yet. Join us and leave the first!</p>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- CALL TO ACTION -->
+    <section class="cta-section">
+        <div class="cta-content">
+            <h2>Start Your Collection Today</h2>
+            <p style="color: var(--text-muted); max-width: 500px; margin: 0 auto 40px auto; font-size: 18px;">
+                Become a member to receive exclusive early access to new releases from top artists and curated auctions.
+            </p>
+            <a href="/login/" class="btn-primary">Join Artify Premium</a>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer style="text-align: center; padding: 30px; background: #050505; border-top: 1px solid var(--glass-border); color: var(--text-muted); font-size: 14px;">
+        <p>&copy; 2026 Artify Gallery. All Rights Reserved.</p>
+    </footer>
+
+
+    <!-- ARTWORK MODAL -->
+    <div id="artworkModal" class="artwork-modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <div class="modal-frame">
+                <div class="hanging-string"></div>
+                <div class="hanging-nail"></div>
+                <img id="modalImage" src="" alt="Artwork">
+            </div>
+            <div class="modal-info">
+                <h3 id="modalTitle">Title</h3>
+                <p id="modalArtist" style="color: var(--primary); font-size: 14px; margin-bottom: 10px;">Artist</p>
+                <div id="modalDesc" style="color: var(--text-muted); font-size: 15px; line-height: 1.6; margin-bottom: 20px;"></div>
+                <div id="modalPrice" class="price" style="font-size: 24px; font-weight: bold; margin-bottom: 20px;"></div>
+                <div id="modalActions"></div>
+            </div>
+        </div>
+    </div>
+
+<script>
+
+        // MODAL LOGIC
+        function openModal(title, artist, desc, price, imgUrl, itemId, status, isBuyer) {
+            const modal = document.getElementById('artworkModal');
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalArtist').textContent = 'by ' + artist;
+            document.getElementById('modalDesc').textContent = desc || 'An exclusive masterpiece available on Artify.';
+            document.getElementById('modalPrice').textContent = '₹' + price;
+            document.getElementById('modalImage').src = imgUrl;
+            
+            let actionsObj = document.getElementById('modalActions');
+            if(actionsObj && isBuyer && status === 'available') {
+                actionsObj.innerHTML = `<button class="btn btn-primary" onclick="addToCart(${itemId}, '${title.replace(/'/g, "\'")}', ${price}, '${imgUrl}')">Add to Cart</button>`;
+            } else if (actionsObj && isBuyer) {
+                actionsObj.innerHTML = `<div style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); padding: 8px 16px; border-radius: 20px; display: inline-block; font-size: 14px; font-weight: 700; text-transform: uppercase;">Sold Out</div>`;
+            }
+
+            modal.style.display = 'flex';
+            setTimeout(() => { modal.classList.add('show'); }, 10);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('artworkModal');
+            modal.classList.remove('show');
+            setTimeout(() => { modal.style.display = 'none'; }, 400);
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('artworkModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+</script>
+</body>
+</html>

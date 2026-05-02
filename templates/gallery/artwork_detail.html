@@ -1,0 +1,393 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ artwork.title }} | Artify</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #d4af37;
+            --bg-dark: #070707;
+            --bg-card: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f4f4f4;
+            --text-muted: #a0a0a0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: radial-gradient(circle at top, rgba(212, 175, 55, 0.14), transparent 28%), var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        .page {
+            width: min(1180px, calc(100% - 32px));
+            margin: 0 auto;
+            padding: 32px 0 48px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            gap: 16px;
+        }
+
+        .back-link {
+            color: var(--text-main);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .status-pill {
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .status-available {
+            color: #22c55e;
+            background: rgba(34, 197, 94, 0.12);
+            border: 1px solid rgba(34, 197, 94, 0.22);
+        }
+
+        .status-sold {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.22);
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 28px;
+        }
+
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            overflow: hidden;
+            backdrop-filter: blur(16px);
+        }
+
+        .art-image {
+            width: 100%;
+            height: 100%;
+            min-height: 520px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .content {
+            padding: 30px;
+            display: grid;
+            gap: 24px;
+        }
+
+        .eyebrow {
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1.4px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        h1 {
+            font-size: clamp(32px, 4vw, 52px);
+            line-height: 1.05;
+        }
+
+        .price {
+            color: var(--primary);
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .description {
+            color: var(--text-muted);
+            line-height: 1.8;
+            font-size: 16px;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .meta-card,
+        .author-card,
+        .review-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            padding: 18px;
+        }
+
+        .meta-label {
+            color: var(--text-muted);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.9px;
+            margin-bottom: 8px;
+        }
+
+        .meta-value {
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .author-card {
+            display: grid;
+            grid-template-columns: 88px 1fr;
+            gap: 18px;
+            align-items: start;
+        }
+
+        .author-avatar {
+            width: 88px;
+            height: 88px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary);
+        }
+
+        .author-name {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .author-bio {
+            color: var(--text-muted);
+            line-height: 1.8;
+            margin-bottom: 12px;
+        }
+
+        .author-meta {
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .author-stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .author-stat {
+            padding: 14px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--glass-border);
+        }
+
+        .author-stat-label {
+            color: var(--text-muted);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 6px;
+        }
+
+        .author-stat-value {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        .review-list {
+            display: grid;
+            gap: 14px;
+        }
+
+        .review-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .reviewer {
+            font-weight: 700;
+        }
+
+        .review-date,
+        .empty-copy {
+            color: var(--text-muted);
+        }
+
+        .review-text {
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+
+        @media (max-width: 900px) {
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .art-image {
+                min-height: 340px;
+            }
+
+            .author-card {
+                grid-template-columns: 1fr;
+            }
+
+            .author-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 560px) {
+            .meta-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <div class="topbar">
+            <a href="{% url 'buyer' %}" class="back-link">← Back to Buyer Dashboard</a>
+            {% if artwork.status == 'available' %}
+            <div class="status-pill status-available">Available</div>
+            {% else %}
+            <div class="status-pill status-sold">Sold Out</div>
+            {% endif %}
+        </div>
+
+        <div class="detail-grid">
+            <div class="panel">
+                {% if artwork.image %}
+                <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}" class="art-image">
+                {% else %}
+                <img src="https://picsum.photos/1200/900?random={{ artwork.id }}" alt="{{ artwork.title }}" class="art-image">
+                {% endif %}
+            </div>
+
+            <div class="panel content">
+                <div>
+                    <div class="eyebrow">{{ artwork.category.name|default:"Artwork Detail" }}</div>
+                    <h1>{{ artwork.title }}</h1>
+                </div>
+
+                <div class="price">₹{{ artwork.price }}</div>
+
+                <p class="description">{{ artwork.description }}</p>
+
+                <div class="meta-grid">
+                    <div class="meta-card">
+                        <div class="meta-label">Artist</div>
+                        <div class="meta-value">{{ artwork.seller.username }}</div>
+                    </div>
+                    <div class="meta-card">
+                        <div class="meta-label">Posted On</div>
+                        <div class="meta-value">{{ artwork.created_at|date:"M d, Y" }}</div>
+                    </div>
+                    <div class="meta-card">
+                        <div class="meta-label">Last Updated</div>
+                        <div class="meta-value">{{ artwork.updated_at|date:"M d, Y" }}</div>
+                    </div>
+                    <div class="meta-card">
+                        <div class="meta-label">Views</div>
+                        <div class="meta-value">{{ artwork.views }}</div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="section-title">About The Author</div>
+                    <div class="author-card">
+                        {% if author_profile and author_profile.profile_pic %}
+                        <img src="{{ author_profile.profile_pic.url }}" alt="{{ artwork.seller.username }}" class="author-avatar">
+                        {% else %}
+                        <img src="https://ui-avatars.com/api/?name={{ artwork.seller.username }}&background=d4af37&color=000" alt="{{ artwork.seller.username }}" class="author-avatar">
+                        {% endif %}
+                        <div>
+                            <div class="author-name">{{ artwork.seller.username }}</div>
+                            <div class="author-bio">
+                                {% if author_profile and author_profile.bio %}
+                                {{ author_profile.bio }}
+                                {% else %}
+                                This artist is sharing original work on Artify. Their profile bio will appear here when available.
+                                {% endif %}
+                            </div>
+                            <div class="author-meta">
+                                {% if artwork.seller.email %}
+                                Contact: {{ artwork.seller.email }}<br>
+                                {% else %}
+                                Contact details are not available.<br>
+                                {% endif %}
+                                Member since {{ artwork.seller.date_joined|date:"M Y" }}
+                            </div>
+                            <div class="author-stats">
+                                <div class="author-stat">
+                                    <div class="author-stat-label">Published Works</div>
+                                    <div class="author-stat-value">{{ artist_artwork_count }}</div>
+                                </div>
+                                <div class="author-stat">
+                                    <div class="author-stat-label">Available Now</div>
+                                    <div class="author-stat-value">{{ artist_available_count }}</div>
+                                </div>
+                                <div class="author-stat">
+                                    <div class="author-stat-label">Total Views</div>
+                                    <div class="author-stat-value">{{ artist_total_views }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 28px;">
+            <div class="section-title">Reviews</div>
+            {% if reviews %}
+            <div class="review-list">
+                {% for review in reviews %}
+                <div class="review-card">
+                    <div class="review-head">
+                        <div class="reviewer">{{ review.reviewer.username }}</div>
+                        <div class="review-date">{{ review.created_at|date:"M d, Y" }}</div>
+                    </div>
+                    <div class="review-text">Rating: {{ review.get_rating_display }}</div>
+                    {% if review.comment %}
+                    <div class="review-text" style="margin-top: 8px;">{{ review.comment }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="review-card empty-copy">No reviews yet for this artwork.</div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

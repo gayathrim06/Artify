@@ -1,0 +1,149 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Review | Artify</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #d4af37;
+            --bg-dark: #070707;
+            --glass-bg: rgba(10, 10, 10, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f4f4f4;
+            --text-muted: #a0a0a0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: ""; position: absolute; top:0; left:0; right:0; bottom:0;
+            background: url('{% static "images/hero_bg.png" %}') no-repeat center center;
+            background-size: cover; filter: brightness(0.2) blur(8px); z-index: -1;
+        }
+
+        .form-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            padding: 50px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+            margin: 40px 0;
+            animation: slideUp 0.6s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { font-size: 32px; font-weight: 800; margin-bottom: 10px; }
+        .header h1 span { color: var(--primary); }
+        .header p { color: var(--text-muted); font-size: 15px; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 8px; color: var(--text-muted); font-size: 13px; text-transform: uppercase; letter-spacing: 1px; }
+
+        .form-control, .form-control-file {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 14px 18px;
+            color: #fff;
+            font-size: 15px;
+            font-family: 'Outfit', sans-serif;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus { border-color: var(--primary); background: rgba(255, 255, 255, 0.06); }
+        
+        select.form-control {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-weight: 600;
+        }
+
+        select.form-control option {
+            color: #000;
+        }
+        
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary);
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+
+        .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3); }
+
+        .back-link { display: inline-block; margin-bottom: 20px; color: var(--primary); text-decoration: none; font-weight: 600; font-size: 14px; }
+        .back-link:hover { text-decoration: underline; }
+
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <a href="javascript:history.back()" class="back-link"><i class="fa fa-arrow-left"></i> Back</a>
+        
+        <div class="header">
+            <h1>Edit <span>Review</span></h1>
+            <p>Update your testimonial.</p>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label>Rating</label>
+                <select name="rating" class="form-control" required>
+                    <option value="5" {% if testimonial.rating == 5 %}selected{% endif %}>⭐⭐⭐⭐⭐ - Excellent</option>
+                    <option value="4" {% if testimonial.rating == 4 %}selected{% endif %}>⭐⭐⭐⭐ - Very Good</option>
+                    <option value="3" {% if testimonial.rating == 3 %}selected{% endif %}>⭐⭐⭐ - Good</option>
+                    <option value="2" {% if testimonial.rating == 2 %}selected{% endif %}>⭐⭐ - Fair</option>
+                    <option value="1" {% if testimonial.rating == 1 %}selected{% endif %}>⭐ - Poor</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Review</label>
+                <textarea name="comment" class="form-control" rows="4" required>{{ testimonial.comment }}</textarea>
+            </div>
+
+            <button type="submit" class="btn-submit">Save Changes</button>
+        </form>
+    </div>
+
+</body>
+</html>
