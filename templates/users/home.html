@@ -103,6 +103,54 @@
             background: var(--primary);
         }
 
+        /* FILTER BAR */
+        .filter-bar {
+            position: fixed;
+            top: 80px; /* Below the main navbar */
+            width: 100%;
+            background: rgba(15, 15, 15, 0.4);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            z-index: 999;
+            padding: 12px 0;
+            overflow-x: auto;
+        }
+
+        .filter-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 0 40px;
+        }
+
+        .filter-item {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .filter-item:hover {
+            color: var(--primary);
+            background: rgba(212, 175, 55, 0.05);
+        }
+
+        .filter-item.active {
+            color: #000;
+            background: var(--primary);
+            font-weight: 800;
+            border-color: var(--primary);
+        }
+
         /* HERO SECTION */
         .hero {
             height: 100vh;
@@ -528,6 +576,16 @@
             <a href="/login/">Login</a>
         </div>
     </nav>
+    
+    <!-- CATEGORY FILTER BAR -->
+    <div class="filter-bar">
+        <div class="filter-container">
+            <a href="/" class="filter-item {% if not active_category %}active{% endif %}">All Works</a>
+            {% for cat in categories %}
+            <a href="/?category={{ cat.name }}" class="filter-item {% if active_category == cat.name %}active{% endif %}">{{ cat.name }}</a>
+            {% endfor %}
+        </div>
+    </div>
 
     <!-- HERO SECTION -->
     <header class="hero">

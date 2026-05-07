@@ -86,11 +86,31 @@ def admin_reply_testimonial(request, pk):
     return redirect('dashboard')
 
 def home(request):
-    from gallery.models import Artwork, Testimonial
-    try: testimonials = list(Testimonial.objects.all().order_by('-created_at')[:10])
-    except: testimonials = []
-    featured_artworks = Artwork.objects.all().order_by('-created_at')[:6]
-    return render(request, 'users/home.html', {'featured_artworks': featured_artworks, 'testimonials': testimonials})
+    from gallery.models import Artwork, Testimonial, Category
+    category_name = request.GET.get('category')
+    
+    # Get all categories for the filter bar
+    categories = Category.objects.all()
+    
+    featured_artworks = Artwork.objects.all().select_related('category', 'seller').order_by('-created_at')
+    
+    if category_name:
+        featured_artworks = featured_artworks.filter(category__name__iexact=category_name)
+    
+    # Still limit to featured on home, but allow filtering
+    featured_artworks = featured_artworks[:12]
+
+    try:
+        testimonials = list(Testimonial.objects.all().order_by('-created_at')[:10])
+    except:
+        testimonials = []
+        
+    return render(request, 'users/home.html', {
+        'featured_artworks': featured_artworks, 
+        'testimonials': testimonials,
+        'categories': categories,
+        'active_category': category_name
+    })
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -146,14 +166,40 @@ def register(request):
 
 @login_required
 def buyer_dashboard(request):
-    from gallery.models import Artwork, OrderItem, Wishlist, Testimonial
-    artworks = Artwork.objects.select_related('category', 'seller').annotate(is_sold=Exists(OrderItem.objects.filter(artwork_id=OuterRef('pk')))).order_by('-created_at')
+    from gallery.models import Artwork, OrderItem, Wishlist, Testimonial, Category
+    category_name = request.GET.get('category')
+    
+    # Get all categories
+    categories = Category.objects.all()
+    
+    artworks = Artwork.objects.select_related('category', 'seller').annotate(
+        is_sold=Exists(OrderItem.objects.filter(artwork_id=OuterRef('pk')))
+    ).order_by('-created_at')
+    
+    if category_name:
+        artworks = artworks.filter(category__name__iexact=category_name)
+        
     wishlist, _ = Wishlist.objects.get_or_create(user=request.user)
-    wishlist_artworks = wishlist.artworks.all().annotate(is_sold=Exists(OrderItem.objects.filter(artwork_id=OuterRef('pk'))))
+    wishlist_artworks = wishlist.artworks.all().annotate(
+        is_sold=Exists(OrderItem.objects.filter(artwork_id=OuterRef('pk')))
+    )
     show_login_welcome = request.session.pop('show_login_welcome', False)
     user_testimonials = Testimonial.objects.filter(user=request.user).order_by('-created_at')
-    wishlist_payload = [{'id': aw.id, 'title': aw.title, 'price': str(aw.price), 'image_url': aw.image.url if aw.image else '', 'is_available': aw.status == 'available'} for aw in wishlist_artworks]
-    return render(request, 'users/buyer_dashboard.html', {'artworks': artworks, 'wishlist_artworks': wishlist_artworks, 'wishlist_payload': wishlist_payload, 'show_login_welcome': show_login_welcome, 'user_testimonials': user_testimonials})
+    
+    wishlist_payload = [
+        {'id': aw.id, 'title': aw.title, 'price': str(aw.price), 'image_url': aw.image.url if aw.image else '', 'is_available': aw.status == 'available'} 
+        for aw in wishlist_artworks
+    ]
+    
+    return render(request, 'users/buyer_dashboard.html', {
+        'artworks': artworks, 
+        'wishlist_artworks': wishlist_artworks, 
+        'wishlist_payload': wishlist_payload, 
+        'show_login_welcome': show_login_welcome, 
+        'user_testimonials': user_testimonials,
+        'categories': categories,
+        'active_category': category_name
+    })
 
 @login_required
 def seller_dashboard(request):

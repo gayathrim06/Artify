@@ -89,8 +89,53 @@
             position: relative;
         }
 
-        .nav-links a:hover {
+        .nav-links a:hover { color: var(--primary); }
+
+        /* FILTER BAR */
+        .filter-bar {
+            position: sticky;
+            top: 75px; /* Adjust based on your main navbar height */
+            width: 100%;
+            background: rgba(10, 10, 10, 0.6);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--glass-border);
+            z-index: 900;
+            padding: 15px 0;
+            margin-bottom: 20px;
+        }
+
+        .filter-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 0 40px;
+        }
+
+        .filter-item {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 8px 20px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            border: 1px solid transparent;
+        }
+
+        .filter-item:hover {
             color: var(--primary);
+            background: rgba(212, 175, 55, 0.05);
+        }
+
+        .filter-item.active {
+            color: #000;
+            background: var(--primary);
+            font-weight: 800;
         }
 
         .nav-links a::after {
@@ -757,6 +802,16 @@
             <a href="/logout/">Logout</a>
         </div>
     </nav>
+    
+    <!-- CATEGORY FILTER BAR -->
+    <div class="filter-bar">
+        <div class="filter-container">
+            <a href="{% url 'buyer' %}" class="filter-item {% if not active_category %}active{% endif %}">All Collections</a>
+            {% for cat in categories %}
+            <a href="{% url 'buyer' %}?category={{ cat.name }}" class="filter-item {% if active_category == cat.name %}active{% endif %}">{{ cat.name }}</a>
+            {% endfor %}
+        </div>
+    </div>
 
     <main class="main">
         {% if messages %}
