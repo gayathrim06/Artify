@@ -284,8 +284,21 @@
     <div class="register-container">
         <div class="register-form">
             <h2>Join Arti<span>fy</span></h2>
-            <form method="POST">
+            
+            {% if messages %}
+                {% for message in messages %}
+                    <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #ef4444; padding: 15px; border-radius: 12px; margin-bottom: 20px; font-weight: 600; text-align: center;">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form id="registerForm" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
+                <div class="form-group">
+                    <label for="full_name">Full Name</label>
+                    <input type="text" id="full_name" name="full_name" placeholder="Enter your full name" required>
+                </div>
                 <div class="form-group">
                     <label for="username">Username</label>
                     <input type="text" id="username" name="username" placeholder="Choose a username" required>
@@ -315,6 +328,18 @@
                         <label for="password2">Confirm Password</label>
                         <input type="password" id="password2" name="password2" placeholder="Confirm your password" required>
                     </div>
+                </div>
+                
+                <div id="seller-fields" style="display: none; margin-top: 15px;">
+                    <div class="form-group">
+                        <label for="profile_pic">Profile Picture</label>
+                        <input type="file" id="profile_pic" name="profile_pic" accept="image/*">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bio">Biography</label>
+                        <textarea id="bio" name="bio" rows="4" placeholder="Tell us about yourself and your art" style="width: 100%; padding: 14px 18px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 12px; color: #fff; font-size: 16px; font-family: 'Outfit', sans-serif; resize: vertical;"></textarea>
+                    </div>
                 </div><br>               
                 <button type="submit">Create Account</button>
             </form>
@@ -325,5 +350,24 @@
         </div>
     </div>
 
+    <script>
+        document.getElementById('role').addEventListener('change', function() {
+            var sellerFields = document.getElementById('seller-fields');
+            if (this.value === 'seller') {
+                sellerFields.style.display = 'block';
+            } else {
+                sellerFields.style.display = 'none';
+            }
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            var pass1 = document.getElementById('password').value;
+            var pass2 = document.getElementById('password2').value;
+            if (pass1 !== pass2) {
+                e.preventDefault();
+                alert("Passwords do not match! Please check and try again.");
+            }
+        });
+    </script>
 </body>
 </html>

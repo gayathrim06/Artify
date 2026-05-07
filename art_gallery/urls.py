@@ -29,6 +29,7 @@ urlpatterns = [
 
     path('seller/', views.seller_dashboard, name='seller'),
     path('logout/', views.logout_view, name='logout'),
+    path('api/artist/<str:username>/', views.artist_details_api, name='artist_details_api'),
 ]
 
 if settings.DEBUG:

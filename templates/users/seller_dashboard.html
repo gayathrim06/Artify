@@ -260,7 +260,7 @@
     <!-- HERO SECTION -->
     <header class="hero">
         <div>
-            <h1>Welcome <span>{{ request.user.username }}</span>!</h1>
+            <h1>Welcome <span>{{ request.user.get_full_name|default:request.user.username }}</span>!</h1>
             <p>What's your next masterpiece?</p>
         </div>
     </header>
@@ -271,14 +271,11 @@
         <!-- ABOUT AUTHOR -->
         <section class="portfolio-card">
             <!-- Checking if the user uploaded a profile pic, else fallback -->
-            {% if profile and profile.profile_pic %}
-                <img src="{{ profile.profile_pic.url }}" class="profile-img" alt="Author">
-            {% else %}
-                <img src="https://ui-avatars.com/api/?name={{ request.user.username }}&background=d4af37&color=000" class="profile-img" alt="Author">
-            {% endif %}
-            
+            <div class="profile-img" style="display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 800; color: #000; background: var(--primary);">
+                {{ user.username|make_list|first|upper }}
+            </div>
             <div class="profile-info">
-                <h2>{{ request.user.username }}</h2>
+                <h2>{{ request.user.get_full_name|default:request.user.username }}</h2>
                 <p>
                     {% if profile and profile.bio %}
                         {{ profile.bio }}

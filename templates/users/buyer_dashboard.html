@@ -696,6 +696,33 @@
             max-height: 60vh;
             object-fit: contain;
             box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            z-index: 2;
+            position: relative;
+        }
+
+        .modal-table {
+            flex: 1;
+            padding: 30px;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            position: relative;
+        }
+
+        .modal-table::after {
+            content: '';
+            position: absolute;
+            bottom: 10px;
+            left: 10%;
+            right: 10%;
+            height: 40px;
+            background: linear-gradient(to bottom, #1a1a1a, #000);
+            z-index: 1;
+            border-radius: 50%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.9);
         }
 
         .modal-info {
@@ -723,7 +750,6 @@
     <nav class="navbar">
         <div class="logo">Arti<span>fy</span></div>
         <div class="nav-links">
-            <a href="/">Home</a>
             <a href="#artworks">Artworks</a>
             <a href="#wishlist">Wishlist</a>
             <a href="#notifications">Notifications</a>
@@ -743,12 +769,12 @@
         {% if show_login_welcome %}
         <div class="welcome-panel">
             <strong>Welcome to your buyer dashboard</strong>
-            <p>Hello {{ request.user.username }}, your collector space is ready. Click any painting to open its full story, see who created it, when it was posted, and learn more about the artist behind it.</p>
+            <p>Hello {{ request.user.get_full_name|default:request.user.username }}, your collector space is ready. Click any painting to open its full story, see who created it, when it was posted, and learn more about the artist behind it.</p>
         </div>
         {% endif %}
         <section class="hero-section">
             <div class="hero-badge">Collector Space</div>
-            <h1>Welcome <span style="color: var(--primary);">{{ request.user.username }}</span></h1>
+            <h1>Welcome <span style="color: var(--primary);">{{ request.user.get_full_name|default:request.user.username }}</span></h1>
             <p>Explore beautiful artwork, track your cart, manage your wishlist, and discover the story behind every painting and artist.</p>
         </section>
 
@@ -757,7 +783,7 @@
             <div class="grid">
                 {% for artwork in artworks %}
                 <div class="card">
-                    <a href="javascript:void(0);" onclick="openModal('{{ artwork.title|escapejs }}', '{{ artwork.seller.username|escapejs }}', '{{ artwork.description|escapejs }}', '{{ artwork.price }}', '{% if artwork.image %}{{ artwork.image.url }}{% else %}https://picsum.photos/800/600?random={{ forloop.counter }}{% endif %}', '{{ artwork.id }}', '{{ artwork.status }}', true)" class="card-link">
+                    <a href="javascript:void(0);" onclick="openModal('{{ artwork.title|escapejs }}', '{{ artwork.seller.username|escapejs }}', '{{ artwork.description|escapejs }}', '{{ artwork.price }}', '{% if artwork.image %}{{ artwork.image.url }}{% else %}https://picsum.photos/800/600?random={{ forloop.counter }}{% endif %}', '{{ artwork.id }}', '{{ artwork.status }}', true, '{{ artwork.category.name|default:""|escapejs }}')" class="card-link">
                     {% if artwork.image %}
                     <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}">
                     {% else %}
@@ -765,7 +791,7 @@
                     {% endif %}
                     </a>
                     <div class="card-body">
-                        <a href="javascript:void(0);" onclick="openModal('{{ artwork.title|escapejs }}', '{{ artwork.seller.username|escapejs }}', '{{ artwork.description|escapejs }}', '{{ artwork.price }}', '{% if artwork.image %}{{ artwork.image.url }}{% else %}https://picsum.photos/800/600?random={{ forloop.counter }}{% endif %}', '{{ artwork.id }}', '{{ artwork.status }}', true)" class="card-link">
+                        <a href="javascript:void(0);" onclick="openModal('{{ artwork.title|escapejs }}', '{{ artwork.seller.username|escapejs }}', '{{ artwork.description|escapejs }}', '{{ artwork.price }}', '{% if artwork.image %}{{ artwork.image.url }}{% else %}https://picsum.photos/800/600?random={{ forloop.counter }}{% endif %}', '{{ artwork.id }}', '{{ artwork.status }}', true, '{{ artwork.category.name|default:""|escapejs }}')" class="card-link">
                             <div class="card-title">{{ artwork.title }}</div>
                             <div class="card-subtitle">{{ artwork.category.name }} | by {{ artwork.seller.username }}</div>
                         </a>
@@ -1187,13 +1213,29 @@
         }
     
         // MODAL LOGIC
-        function openModal(title, artist, desc, price, imgUrl, itemId, status, isBuyer) {
+        function openModal(title, artist, desc, price, imgUrl, itemId, status, isBuyer, category) {
             const modal = document.getElementById('artworkModal');
             document.getElementById('modalTitle').textContent = title;
             document.getElementById('modalArtist').textContent = 'by ' + artist;
             document.getElementById('modalDesc').textContent = desc || 'An exclusive masterpiece available on Artify.';
             document.getElementById('modalPrice').textContent = '₹' + price;
             document.getElementById('modalImage').src = imgUrl;
+
+            // Frame vs Table display
+            const cat = (category || "").toLowerCase();
+            const frameContainer = document.getElementById('modalFrameContainer');
+            const stringObj = document.getElementById('modalString');
+            const nailObj = document.getElementById('modalNail');
+
+            if (cat.includes('sculpture') || cat.includes('pottery')) {
+                frameContainer.className = 'modal-table';
+                if(stringObj) stringObj.style.display = 'none';
+                if(nailObj) nailObj.style.display = 'none';
+            } else {
+                frameContainer.className = 'modal-frame';
+                if(stringObj) stringObj.style.display = 'block';
+                if(nailObj) nailObj.style.display = 'block';
+            }
             
             let actionsObj = document.getElementById('modalActions');
             if(actionsObj && isBuyer && status === 'available') {
@@ -1201,6 +1243,50 @@
             } else if (actionsObj && isBuyer) {
                 actionsObj.innerHTML = `<div style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); padding: 8px 16px; border-radius: 20px; display: inline-block; font-size: 14px; font-weight: 700; text-transform: uppercase;">Sold Out</div>`;
             }
+
+            // Reset artist details
+            document.getElementById('artistDetailsContainer').style.display = 'none';
+            document.getElementById('artistPic').style.display = 'none';
+            document.getElementById('artistBio').textContent = 'Loading artist details...';
+            document.getElementById('otherWorksContainer').innerHTML = '';
+
+            // Fetch artist details
+            fetch(`/api/artist/${encodeURIComponent(artist)}/`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('artistDetailsContainer').style.display = 'block';
+                        
+                        if (data.profile_pic) {
+                            const pic = document.getElementById('artistPic');
+                            pic.src = data.profile_pic;
+                            pic.style.display = 'block';
+                        }
+                        
+                        document.getElementById('artistBio').textContent = data.bio || 'No biography provided.';
+                        
+                        const otherWorksContainer = document.getElementById('otherWorksContainer');
+                        if (data.other_artworks && data.other_artworks.length > 0) {
+                            data.other_artworks.forEach(aw => {
+                                // Skip current artwork
+                                if (aw.id.toString() !== itemId.toString()) {
+                                    const img = document.createElement('img');
+                                    img.src = aw.image_url;
+                                    img.style.width = '60px';
+                                    img.style.height = '60px';
+                                    img.style.objectFit = 'cover';
+                                    img.style.borderRadius = '5px';
+                                    img.style.cursor = 'pointer';
+                                    img.style.border = '1px solid var(--glass-border)';
+                                    img.onclick = () => {
+                                        openModal(aw.title, artist, 'An exclusive masterpiece available on Artify.', aw.price, aw.image_url, aw.id, 'available', isBuyer, aw.category);
+                                    };
+                                    otherWorksContainer.appendChild(img);
+                                }
+                            });
+                        }
+                    }
+                });
 
             modal.style.display = 'flex';
             setTimeout(() => { modal.classList.add('show'); }, 10);
@@ -1225,9 +1311,9 @@
     <div id="artworkModal" class="artwork-modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal()">&times;</span>
-            <div class="modal-frame">
-                <div class="hanging-string"></div>
-                <div class="hanging-nail"></div>
+            <div id="modalFrameContainer" class="modal-frame">
+                <div class="hanging-string" id="modalString"></div>
+                <div class="hanging-nail" id="modalNail"></div>
                 <img id="modalImage" src="" alt="Artwork">
             </div>
             <div class="modal-info">
@@ -1236,6 +1322,18 @@
                 <div id="modalDesc" style="color: var(--text-muted); font-size: 15px; line-height: 1.6; margin-bottom: 20px;"></div>
                 <div id="modalPrice" class="price" style="font-size: 24px; font-weight: bold; margin-bottom: 20px;"></div>
                 <div id="modalActions"></div>
+
+                <!-- Artist Details -->
+                <div id="artistDetailsContainer" style="display: none; margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                        <img id="artistPic" src="" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; display: none;">
+                        <div id="artistBio" style="font-size: 13px; color: var(--text-muted); line-height: 1.4;"></div>
+                    </div>
+                    <div>
+                        <h4 style="font-size: 14px; color: #fff; margin-bottom: 10px; text-transform: uppercase;">Other Works</h4>
+                        <div id="otherWorksContainer" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
