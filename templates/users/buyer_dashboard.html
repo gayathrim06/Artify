@@ -91,51 +91,39 @@
 
         .nav-links a:hover { color: var(--primary); }
 
-        /* FILTER BAR */
-        .filter-bar {
-            position: sticky;
-            top: 75px; /* Adjust based on your main navbar height */
-            width: 100%;
-            background: rgba(10, 10, 10, 0.6);
-            backdrop-filter: blur(15px);
-            border-bottom: 1px solid var(--glass-border);
-            z-index: 900;
-            padding: 15px 0;
-            margin-bottom: 20px;
-        }
-
-        .filter-container {
-            max-width: 1200px;
-            margin: 0 auto;
+        /* FILTER PILLS (INTEGRATED) */
+        .category-filter-container {
             display: flex;
             justify-content: center;
-            gap: 15px;
-            padding: 0 40px;
+            gap: 12px;
+            margin: 30px 0 40px 0;
+            flex-wrap: wrap;
         }
 
-        .filter-item {
+        .filter-pill {
             color: var(--text-muted);
             text-decoration: none;
-            font-size: 13px;
-            font-weight: 600;
+            font-size: 11px;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             padding: 8px 20px;
-            border-radius: 20px;
+            border-radius: 40px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.03);
             transition: all 0.3s ease;
-            white-space: nowrap;
-            border: 1px solid transparent;
         }
 
-        .filter-item:hover {
-            color: var(--primary);
-            background: rgba(212, 175, 55, 0.05);
+        .filter-pill:hover {
+            color: #fff;
+            border-color: var(--primary);
+            background: rgba(212, 175, 55, 0.1);
         }
 
-        .filter-item.active {
+        .filter-pill.active {
             color: #000;
             background: var(--primary);
-            font-weight: 800;
+            border-color: var(--primary);
         }
 
         .nav-links a::after {
@@ -803,16 +791,8 @@
         </div>
     </nav>
     
-    <!-- CATEGORY FILTER BAR -->
-    <div class="filter-bar">
-        <div class="filter-container">
-            <a href="{% url 'buyer' %}" class="filter-item {% if not active_category %}active{% endif %}">All Collections</a>
-            {% for cat in categories %}
-            <a href="{% url 'buyer' %}?category={{ cat.name }}" class="filter-item {% if active_category == cat.name %}active{% endif %}">{{ cat.name }}</a>
-            {% endfor %}
-        </div>
-    </div>
-
+    </nav>
+    
     <main class="main">
         {% if messages %}
             {% for message in messages %}
@@ -836,6 +816,14 @@
         <section class="section" id="artworks">
             <div id="gallery"></div>
             <h2 class="section-title">Featured <span>Collections</span></h2>
+            
+            <!-- NEW INTEGRATED FILTER PILLS -->
+            <div class="category-filter-container">
+                <a href="{% url 'buyer' %}" class="filter-pill {% if not active_category %}active{% endif %}">All Collections</a>
+                {% for cat in categories %}
+                <a href="{% url 'buyer' %}?category={{ cat.name }}" class="filter-pill {% if active_category == cat.name %}active{% endif %}">{{ cat.name }}</a>
+                {% endfor %}
+            </div>
             <div class="grid">
                 {% for artwork in artworks %}
                 <div class="card">
