@@ -687,6 +687,13 @@
         </div>
     </section>
 
+    <!-- FEATURED ARTWORKS -->
+    <section class="featured-art" id="gallery">
+        <div class="section-title">
+            <h2>Featured <span>Collection</span></h2>
+            <p>Handpicked masterpieces from our elite artists.</p>
+        </div>
+
     <!-- CALL TO ACTION -->
     <section class="cta-section">
         <div class="cta-content">
@@ -735,7 +742,17 @@
         </div>
     </div>
 
-<script>
+    <script>
+        // AUTO-SCROLL TO GALLERY IF FILTERED
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('category')) {
+                const gallery = document.getElementById('gallery');
+                if (gallery) {
+                    gallery.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+        };
 
         // MODAL LOGIC
         function openModal(title, artist, desc, price, imgUrl, itemId, status, isBuyer, category) {
