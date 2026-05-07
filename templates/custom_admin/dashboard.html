@@ -361,6 +361,7 @@
                         <th>Email Address</th>
                         <th>Role</th>
                         <th>Joined Date</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -377,6 +378,15 @@
                             {% endif %}
                         </td>
                         <td style="font-size: 13px; color: var(--text-muted);">{{ user.date_joined|date:"M d, Y" }}</td>
+                        <td>
+                            <div style="display: flex; gap: 10px;">
+                                <a href="{% url 'edit_user' user.id %}" style="color: var(--primary); text-decoration: none; font-size: 14px; font-weight: 700;"><i class="fa fa-edit"></i> Edit</a>
+                                <form action="{% url 'delete_user' user.id %}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to PERMANENTLY delete user {{ user.username }}? This cannot be undone.');">
+                                    {% csrf_token %}
+                                    <button type="submit" style="background: transparent; border: none; color: #ef4444; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'Outfit';"><i class="fa fa-trash"></i> Delete</button>
+                                </form>
+                            </div>
+                        </td>
                     </tr>
                     {% empty %}
                     <tr>

@@ -16,6 +16,8 @@ urlpatterns = [
     path('admin-login/', views.admin_login, name='admin_login'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('admin-reply/<int:pk>/', views.admin_reply_testimonial, name='admin_reply_testimonial'),
+    path('edit-user/<int:pk>/', views.edit_user, name='edit_user'),
+    path('delete-user/<int:pk>/', views.delete_user, name='delete_user'),
 
     # User pages
     path('', views.home, name='home'),

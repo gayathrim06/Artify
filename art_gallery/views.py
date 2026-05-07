@@ -43,25 +43,39 @@ def dashboard(request):
     recent_artworks = Artwork.objects.select_related('seller').order_by('-created_at')[:10]
     recent_orders = Order.objects.select_related('buyer').order_by('-created_at')[:10]
     testimonials = Testimonial.objects.select_related('user').order_by('-created_at')
-    
-    # Get all users with their roles
     all_users = User.objects.exclude(is_superuser=True).select_related('profile').order_by('-date_joined')
-    
-    context = {
-        'total_users': total_users,
-        'total_artworks': total_artworks,
-        'total_orders': total_orders,
-        'recent_artworks': recent_artworks,
-        'recent_orders': recent_orders,
-        'testimonials': testimonials,
-        'all_users': all_users,
-    }
+    context = {'total_users': total_users, 'total_artworks': total_artworks, 'total_orders': total_orders, 'recent_artworks': recent_artworks, 'recent_orders': recent_orders, 'testimonials': testimonials, 'all_users': all_users}
     return render(request, 'custom_admin/dashboard.html', context)
 
 @login_required
+def edit_user(request, pk):
+    if not request.user.is_superuser: return redirect('home')
+    user_to_edit = get_object_or_404(User, pk=pk)
+    if request.method == 'POST':
+        user_to_edit.first_name = request.POST.get('first_name', '')
+        user_to_edit.last_name = request.POST.get('last_name', '')
+        user_to_edit.email = request.POST.get('email', '')
+        user_to_edit.save()
+        if hasattr(user_to_edit, 'profile'):
+            user_to_edit.profile.role = request.POST.get('role', 'buyer')
+            user_to_edit.profile.save()
+        messages.success(request, f'User {user_to_edit.username} updated successfully.')
+        return redirect('dashboard')
+    return render(request, 'custom_admin/edit_user.html', {'user_to_edit': user_to_edit})
+
+@login_required
+def delete_user(request, pk):
+    if not request.user.is_superuser: return redirect('home')
+    user_to_delete = get_object_or_404(User, pk=pk)
+    if request.method == 'POST':
+        username = user_to_delete.username
+        user_to_delete.delete()
+        messages.success(request, f'User {username} deleted successfully.')
+    return redirect('dashboard')
+
+@login_required
 def admin_reply_testimonial(request, pk):
-    if not request.user.is_superuser:
-        return redirect('home')
+    if not request.user.is_superuser: return redirect('home')
     from gallery.models import Testimonial
     testimonial = get_object_or_404(Testimonial, pk=pk)
     if request.method == 'POST':
@@ -73,10 +87,8 @@ def admin_reply_testimonial(request, pk):
 
 def home(request):
     from gallery.models import Artwork, Testimonial
-    try:
-        testimonials = list(Testimonial.objects.all().order_by('-created_at')[:10])
-    except:
-        testimonials = []
+    try: testimonials = list(Testimonial.objects.all().order_by('-created_at')[:10])
+    except: testimonials = []
     featured_artworks = Artwork.objects.all().order_by('-created_at')[:6]
     return render(request, 'users/home.html', {'featured_artworks': featured_artworks, 'testimonials': testimonials})
 
@@ -110,11 +122,9 @@ def register(request):
         password = request.POST['password']
         password2 = request.POST['password2']
         if password != password2:
-            messages.error(request, 'Passwords do not match')
-            return redirect('register')
+            messages.error(request, 'Passwords do not match'); return redirect('register')
         if User.objects.filter(username=username).exists():
-            messages.error(request, 'Username already exists')
-            return redirect('register')
+            messages.error(request, 'Username already exists'); return redirect('register')
         user = User.objects.create_user(username=username, email=email, password=password)
         if full_name:
             parts = full_name.split(' ', 1)
@@ -122,8 +132,7 @@ def register(request):
             if len(parts) > 1: user.last_name = parts[1]
             user.save()
         if role == 'seller':
-            user.is_staff = True
-            user.save()
+            user.is_staff = True; user.save()
         from gallery.models import UserProfile
         profile = UserProfile(user=user, role=role)
         if role == 'seller':
