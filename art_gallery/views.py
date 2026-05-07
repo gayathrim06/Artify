@@ -43,7 +43,20 @@ def dashboard(request):
     recent_artworks = Artwork.objects.select_related('seller').order_by('-created_at')[:10]
     recent_orders = Order.objects.select_related('buyer').order_by('-created_at')[:10]
     testimonials = Testimonial.objects.select_related('user').order_by('-created_at')
-    return render(request, 'custom_admin/dashboard.html', {'total_users': total_users, 'total_artworks': total_artworks, 'total_orders': total_orders, 'recent_artworks': recent_artworks, 'recent_orders': recent_orders, 'testimonials': testimonials})
+    
+    # Get all users with their roles
+    all_users = User.objects.exclude(is_superuser=True).select_related('profile').order_by('-date_joined')
+    
+    context = {
+        'total_users': total_users,
+        'total_artworks': total_artworks,
+        'total_orders': total_orders,
+        'recent_artworks': recent_artworks,
+        'recent_orders': recent_orders,
+        'testimonials': testimonials,
+        'all_users': all_users,
+    }
+    return render(request, 'custom_admin/dashboard.html', context)
 
 @login_required
 def admin_reply_testimonial(request, pk):
