@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    .edit-profile-container {
+        max-width: 600px;
+        margin: 100px auto;
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+    
+    .form-group { margin-bottom: 25px; }
+    
+    label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        margin-bottom: 10px;
+    }
+    
+    input[type="text"], textarea, input[type="file"] {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 15px;
+        border-radius: 12px;
+        color: #fff;
+        font-family: 'Outfit', sans-serif;
+        font-size: 15px;
+        outline: none;
+        transition: 0.3s;
+    }
+    
+    input:focus, textarea:focus {
+        border-color: var(--primary);
+        background: rgba(255, 255, 255, 0.08);
+    }
+    
+    .current-pic {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 15px;
+        border: 2px solid var(--primary);
+    }
+</style>
+
+<div class="edit-profile-container">
+    <h2 style="font-size: 32px; font-weight: 800; margin-bottom: 30px; text-align: center;">Edit <span>Profile</span></h2>
+    
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label>Profile Picture</label>
+            {% if profile.profile_pic %}
+                <img src="{{ profile.profile_pic.url }}" class="current-pic" alt="Current Profile Pic">
+            {% endif %}
+            <input type="file" name="profile_pic" accept="image/*">
+        </div>
+        
+        <div class="form-group">
+            <label>Biography</label>
+            <textarea name="bio" rows="5" placeholder="Tell your collectors about your artistic journey...">{{ profile.bio }}</textarea>
+        </div>
+        
+        <div style="display: flex; gap: 15px; margin-top: 40px;">
+            <button type="submit" class="btn btn-primary" style="flex: 1; padding: 15px;">Save Profile</button>
+            <a href="{% url 'seller' %}" class="btn btn-secondary" style="flex: 1; padding: 15px; text-align: center; text-decoration: none;">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

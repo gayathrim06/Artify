@@ -30,4 +30,7 @@ urlpatterns = [
 
     # Reviews
     path('review/<int:pk>/', views.add_review, name='add_review'),
+    
+    # Profile
+    path('profile/edit/', views.edit_profile, name='edit_profile'),
 ]

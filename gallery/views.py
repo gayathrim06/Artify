@@ -386,3 +386,24 @@ def delete_testimonial(request, pk):
         testimonial.delete()
         messages.success(request, 'Your review has been deleted.')
     return redirect(request.META.get('HTTP_REFERER', 'home'))
+
+
+# ================= PROFILE =================
+@login_required
+def edit_profile(request):
+    from users.models import Profile
+    profile, _ = Profile.objects.get_or_create(user=request.user)
+    
+    if request.method == 'POST':
+        bio = request.POST.get('bio')
+        profile_pic = request.FILES.get('profile_pic')
+        
+        profile.bio = bio
+        if profile_pic:
+            profile.profile_pic = profile_pic
+        profile.save()
+        
+        messages.success(request, 'Profile updated successfully!')
+        return redirect('seller')
+    
+    return render(request, 'gallery/edit_profile.html', {'profile': profile})
