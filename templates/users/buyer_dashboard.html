@@ -818,15 +818,15 @@
             <h2 class="section-title">Featured <span>Collections</span></h2>
             
             <!-- NEW INTEGRATED FILTER PILLS -->
-            <div class="category-filter-container">
-                <a href="{% url 'buyer' %}" class="filter-pill {% if not active_category %}active{% endif %}">All Collections</a>
+            <div class="category-filter-container" id="buyerFilters">
+                <a href="javascript:void(0)" onclick="filterArtworks('all', this)" class="filter-pill {% if not active_category %}active{% endif %}">All Collections</a>
                 {% for cat in categories %}
-                <a href="{% url 'buyer' %}?category={{ cat.name }}" class="filter-pill {% if active_category == cat.name %}active{% endif %}">{{ cat.name }}</a>
+                <a href="javascript:void(0)" onclick="filterArtworks('{{ cat.name|escapejs }}', this)" class="filter-pill {% if active_category == cat.name %}active{% endif %}">{{ cat.name }}</a>
                 {% endfor %}
             </div>
             <div class="grid">
                 {% for artwork in artworks %}
-                <div class="card">
+                <div class="card artwork-card" data-category="{{ artwork.category.name|default:'' }}">
                     <a href="javascript:void(0);" onclick="openModal('{{ artwork.title|escapejs }}', '{{ artwork.seller.username|escapejs }}', '{{ artwork.description|escapejs }}', '{{ artwork.price }}', '{% if artwork.image %}{{ artwork.image.url }}{% else %}https://picsum.photos/800/600?random={{ forloop.counter }}{% endif %}', '{{ artwork.id }}', '{{ artwork.status }}', true, '{{ artwork.category.name|default:""|escapejs }}')" class="card-link">
                     {% if artwork.image %}
                     <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}">
@@ -992,6 +992,26 @@
     {{ wishlist_payload|json_script:"wishlist-data" }}
 
     <script>
+        // RESPONSIVE FILTERING
+        function filterArtworks(category, element) {
+            // Update active pill
+            const container = element.closest('.category-filter-container');
+            container.querySelectorAll('.filter-pill').forEach(pill => pill.classList.remove('active'));
+            element.classList.add('active');
+
+            // Filter cards
+            const cards = document.querySelectorAll('.artwork-card');
+            let hasVisible = false;
+            cards.forEach(card => {
+                if (category === 'all' || card.getAttribute('data-category') === category) {
+                    card.style.display = 'block';
+                    hasVisible = true;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
         function toggleCart(e) {
             if (e) e.preventDefault();
             const sidebar = document.getElementById('sidebar');

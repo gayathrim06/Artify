@@ -277,7 +277,7 @@
 
         <div class="page-header">
             <h1>Platform Overview</h1>
-            <p>Welcome back, Administrator. Here's what's happening on Artify.</p>
+            <p>Welcome back, {{ request.user.username|default:"gayathri"|title }}. Here's what's happening on Artify.</p>
         </div>
 
         <div class="metrics-grid">

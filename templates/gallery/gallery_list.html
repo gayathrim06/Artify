@@ -568,21 +568,28 @@
     
     <!-- Hero section remains same -->
 
-    <!-- HERO SECTION -->
-    <header class="hero">
-        <div class="hero-content">
-            <h1>Discover the <span>Masterpieces</span></h1>
-            <p>Immerse yourself in a curated world of premium art, aesthetic pottery, and visionary creations from independent artists worldwide.</p>
-            <a href="#artworks" class="btn-primary">Explore Gallery</a>
         </div>
-    </header>
+    </section>
 
-    <!-- ARTWORKS COLLECTION -->
-    <section class="section" id="artworks">
-        <h2 class="section-title">Exclusive <span>Collections</span></h2>
-        
-        <div class="grid" id="artworks-grid">
-            {% for artwork in featured_artworks %}
+
+
+    <!-- FULL ARTWORKS COLLECTION -->
+    <section class="featured-art" id="gallery" style="padding-top: 100px; padding-bottom: 50px;">
+        <div class="section-title">
+            <h2>Complete <span>Collection</span></h2>
+            <p>Browse our entire catalog of masterpieces.</p>
+        </div>
+
+        <!-- NEW INTEGRATED FILTER PILLS -->
+        <div class="category-filter-container" id="galleryFilters">
+            <a href="javascript:void(0)" onclick="filterArtworks('all', this)" class="filter-pill {% if not active_category %}active{% endif %}">All Masterpieces</a>
+            {% for cat in categories %}
+            <a href="javascript:void(0)" onclick="filterArtworks('{{ cat.name|escapejs }}', this)" class="filter-pill {% if active_category == cat.name %}active{% endif %}">{{ cat.name }}</a>
+            {% endfor %}
+        </div>
+
+        <div class="grid" id="artworks-grid" style="padding: 0 10%;">
+            {% for artwork in artworks %}
             <div class="card artwork-card" data-category="{{ artwork.category.name|default:'' }}">
                 <div class="card-img-wrapper" onclick="openModal('{{ artwork.title|escapejs }}', '{{ artwork.seller.username|escapejs }}', '{{ artwork.description|escapejs }}', '{{ artwork.price }}', '{% if artwork.image %}{{ artwork.image.url }}{% else %}{% static "images/art1.png" %}{% endif %}', '{{ artwork.id }}', '{{ artwork.status }}', false, '{{ artwork.category.name|default:""|escapejs }}')" style="cursor:pointer;">
                     {% if artwork.image %}
@@ -607,78 +614,6 @@
             {% empty %}
             <p style="color: var(--text-muted); text-align: center; width: 100%;">No artworks have been published yet.</p>
             {% endfor %}
-        </div>
-        <div style="text-align: center; margin-top: 50px;">
-            <a href="{% url 'gallery:gallery_list' %}" class="btn-primary">View Full Collection</a>
-        </div>
-    </section>
-
-    <!-- PROCESS / VIDEO SECTION -->
-    <section class="section video-section" id="process">
-        <h2 class="section-title">The Art of <span>Creation</span></h2>
-        <p style="color: var(--text-muted); max-width: 600px; margin: 0 auto 50px auto; line-height: 1.6; text-align: center;">
-            Witness the intricate details, passion, and technique behind some of the world's most beautiful handcrafted abstract creations.
-        </p>
-        
-        <div class="video-wrapper">
-            <video controls autoplay muted loop style="width: 100%; max-width: 800px; border-radius: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
-                <source src="{% static "media/Realistic Tiger Charcoal Drawing-Hunter's gaze.mp4" %}" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-        </div>
-    </section>
-
-    <!-- TESTIMONIALS SECTION -->
-    <section class="section" id="testimonials" style="background: #0a0a0a;">
-        <h2 class="section-title">What They <span>Say</span></h2>
-        <div style="display: flex; gap: 20px; overflow-x: auto; padding-bottom: 20px; max-width: 1200px; margin: 0 auto;">
-            {% for review in testimonials %}
-            <div style="min-width: 350px; max-width: 400px; background: rgba(255,255,255,0.05); padding: 25px; border-radius: 15px; border: 1px solid var(--glass-border); display: flex; flex-direction: column;">
-                <!-- Top row: Name & Reviews -->
-                <div style="margin-bottom: 12px;">
-                    <div style="font-size: 22px; font-weight: 700; color: #fff; line-height: 1.1; text-transform: capitalize;">{{ review.user.username }}</div>
-                    <div style="font-size: 14px; color: var(--text-muted); margin-top: 4px;">{{ review.user.testimonials.count }} reviews</div>
-                </div>
-                
-                <!-- Stars & Time -->
-                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
-                    <div style="color: var(--primary); font-size: 16px;">
-                        {% if review.rating == 5 %}⭐⭐⭐⭐⭐{% elif review.rating == 4 %}⭐⭐⭐⭐<span style="opacity: 0.3;">⭐</span>{% elif review.rating == 3 %}⭐⭐⭐<span style="opacity: 0.3;">⭐⭐</span>{% elif review.rating == 2 %}⭐⭐<span style="opacity: 0.3;">⭐⭐⭐</span>{% else %}⭐<span style="opacity: 0.3;">⭐⭐⭐⭐</span>{% endif %}
-                    </div>
-                    <div style="font-size: 14px; color: var(--text-muted);">{{ review.created_at|timesince }} ago</div>
-                </div>
-                
-                <!-- Verified role -->
-                <div style="font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 15px;">
-                    Verified {{ review.role_at_time|default:"Buyer"|title }}
-                </div>
-                
-                <!-- Review text -->
-                <div style="font-size: 15px; color: var(--text-main); line-height: 1.6;">
-                    "{{ review.comment }}"
-                </div>
-
-                {% if review.admin_reply %}
-                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); font-size: 13px; color: var(--primary);">
-                    <strong>Artify Response:</strong><br>
-                    {{ review.admin_reply }}
-                </div>
-                {% endif %}
-            </div>
-            {% empty %}
-            <p style="color: var(--text-muted); text-align: center; width: 100%;">No testimonials yet. Join us and leave the first!</p>
-            {% endfor %}
-        </div>
-    </section>
-
-    <!-- CALL TO ACTION -->
-    <section class="cta-section">
-        <div class="cta-content">
-            <h2>Start Your Collection Today</h2>
-            <p style="color: var(--text-muted); max-width: 500px; margin: 0 auto 40px auto; font-size: 18px;">
-                Become a member to receive exclusive early access to new releases from top artists and curated auctions.
-            </p>
-            <a href="/login/" class="btn-primary">Join Artify Premium</a>
         </div>
     </section>
 
@@ -783,9 +718,9 @@
             }
             
             let actionsObj = document.getElementById('modalActions');
-            if(actionsObj && isBuyer && status === 'available') {
-                actionsObj.innerHTML = `<button class="btn btn-primary" onclick="addToCart(${itemId}, '${title.replace(/'/g, "\'")}', ${price}, '${imgUrl}')">Add to Cart</button>`;
-            } else if (actionsObj && isBuyer) {
+            if(actionsObj && status === 'available') {
+                actionsObj.innerHTML = `<a href="/gallery/add-to-cart/${itemId}/" class="btn btn-primary" style="text-decoration: none;">Add to Cart</a>`;
+            } else if (actionsObj) {
                 actionsObj.innerHTML = `<div style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); padding: 8px 16px; border-radius: 20px; display: inline-block; font-size: 14px; font-weight: 700; text-transform: uppercase;">Sold Out</div>`;
             }
 

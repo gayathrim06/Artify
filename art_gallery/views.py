@@ -98,7 +98,7 @@ def home(request):
         featured_artworks = featured_artworks.filter(category__name__iexact=category_name)
     
     # Still limit to featured on home, but allow filtering
-    featured_artworks = featured_artworks[:12]
+    featured_artworks = featured_artworks[:5]
 
     try:
         testimonials = list(Testimonial.objects.all().order_by('-created_at')[:10])
