@@ -391,8 +391,8 @@ def delete_testimonial(request, pk):
 # ================= PROFILE =================
 @login_required
 def edit_profile(request):
-    from users.models import Profile
-    profile, _ = Profile.objects.get_or_create(user=request.user)
+    from gallery.models import UserProfile
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
     
     if request.method == 'POST':
         bio = request.POST.get('bio')
