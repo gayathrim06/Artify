@@ -351,6 +351,9 @@
                         <textarea id="bio" name="bio" rows="4" placeholder="Tell us about yourself and your art" style="width: 100%; padding: 14px 18px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 12px; color: #fff; font-size: 16px; font-family: 'Outfit', sans-serif; resize: vertical;"></textarea>
                     </div>
                 </div><br>               
+                <div id="password-error" style="display: none; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; text-align: left; animation: fadeUp 0.3s ease-out;">
+                    Passwords do not match! Please check and try again.
+                </div>
                 <button type="submit">Create Account</button>
             </form>
             
@@ -387,7 +390,9 @@
             var pass2 = document.getElementById('password2').value;
             if (pass1 !== pass2) {
                 e.preventDefault();
-                alert("Passwords do not match! Please check and try again.");
+                document.getElementById('password-error').style.display = 'block';
+            } else {
+                document.getElementById('password-error').style.display = 'none';
             }
         });
     </script>
