@@ -127,6 +127,9 @@ def login_view(request):
             if user.is_superuser: return redirect('dashboard')
             elif hasattr(user, 'profile') and user.profile.role == 'seller': return redirect('seller')
             else: return redirect('buyer')
+        else:
+            from django.contrib import messages
+            messages.error(request, 'Invalid username or password')
     return render(request, 'users/login.html')
 
 def register(request):
