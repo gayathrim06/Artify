@@ -95,9 +95,9 @@
             </div>
             <div class="input-group">
                 <label>Password</label>
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <input type="password" name="password" id="id_password" required placeholder="Enter your password" style="flex: 1;">
-                    <button type="button" onclick="togglePassword()" style="background: none; border: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; outline: none; transition: color 0.3s; padding: 0; width: auto;">
+                <div style="position: relative; display: flex; align-items: center;">
+                    <input type="password" name="password" id="id_password" required placeholder="Enter your password" style="width: 100%; padding-right: 45px;">
+                    <button type="button" onclick="togglePassword()" style="position: absolute; right: 15px; background: none; border: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; outline: none; transition: color 0.3s; padding: 0; width: auto; margin: 0; box-shadow: none;">
                         <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                     </button>
                 </div>
